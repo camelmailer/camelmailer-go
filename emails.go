@@ -266,7 +266,7 @@ func (s *EmailsService) Get(ctx context.Context, id int64) (*Email, error) {
 func (s *EmailsService) List(ctx context.Context, opts *ListEmailsOptions) (*ListEmailsResult, error) {
 	query := url.Values{}
 	if opts != nil {
-		opts.ListOptions.values(query)
+		opts.values(query)
 		for key, value := range map[string]string{
 			"scope":  opts.Scope,
 			"status": opts.Status,

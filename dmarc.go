@@ -159,7 +159,7 @@ func (s *DMARCService) Summary(ctx context.Context, opts *DMARCSummaryOptions) (
 func (s *DMARCService) Reports(ctx context.Context, opts *ListDMARCReportsOptions) (*ListDMARCReportsResult, error) {
 	query := url.Values{}
 	if opts != nil {
-		opts.ListOptions.values(query)
+		opts.values(query)
 		if opts.Domain != "" {
 			query.Set("domain", opts.Domain)
 		}

@@ -40,7 +40,7 @@ type ListBouncesResult struct {
 func (s *BouncesService) List(ctx context.Context, opts *ListBouncesOptions) (*ListBouncesResult, error) {
 	query := url.Values{}
 	if opts != nil {
-		opts.ListOptions.values(query)
+		opts.values(query)
 		for key, value := range map[string]string{
 			"scope":  opts.Scope,
 			"status": opts.Status,

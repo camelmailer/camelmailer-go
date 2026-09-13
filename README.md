@@ -4,7 +4,7 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/camelmailer/camelmailer-go.svg)](https://pkg.go.dev/github.com/camelmailer/camelmailer-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-The official Go SDK for [CamelMailer](https://camelmailer.com) — transactional email, nothing else. Zero dependencies, stdlib only.
+The official Go SDK for [Camelmailer](https://camelmailer.com) — transactional email, nothing else. Zero dependencies, stdlib only.
 
 ## Install
 
@@ -29,7 +29,7 @@ sent, err := client.Emails.Send(ctx, &camelmailer.SendEmailRequest{
 
 ## Self-hosted
 
-The client defaults to the CamelMailer cloud. Point it at your own instance:
+The client defaults to the Camelmailer cloud. Point it at your own instance:
 
 ```go
 client := camelmailer.NewClient("cm_xxxx",

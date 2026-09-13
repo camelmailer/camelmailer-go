@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of the CamelMailer Go SDK (stdlib only, zero dependencies).
+- Initial release of the Camelmailer Go SDK (stdlib only, zero dependencies).
 - `Client` with `WithBaseURL`, `WithHTTPClient` and `WithUserAgent` options,
   plus `Client.Ping` for API-key validation.
 - `Emails` service: `Send`, `SendBatch`, `SendWithTemplate`,

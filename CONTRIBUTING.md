@@ -28,7 +28,7 @@ go test ./... -race
 - Test-first: every resource method and error path has a unit test
   against `httptest.Server` (no network in unit tests).
 - Every exported symbol carries a doc comment.
-- Response shapes follow the CamelMailer OpenAPI spec; the envelope
+- Response shapes follow the Camelmailer OpenAPI spec; the envelope
   (`status`/`time`/`data`|`error`) is handled centrally in `Client.do`.
 
 ## Integration test

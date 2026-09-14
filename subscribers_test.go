@@ -33,12 +33,12 @@ func TestSubscribersAdd(t *testing.T) {
 	})
 	subscriber, err := client.Subscribers.Add(context.Background(), "product-news", &AddSubscriberRequest{
 		Address: "ada@example.com",
-		Name:    "Ada",
+		Status:  "subscribed",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if gotBody["address"] != "ada@example.com" || gotBody["name"] != "Ada" {
+	if gotBody["address"] != "ada@example.com" || gotBody["status"] != "subscribed" {
 		t.Errorf("body = %v", gotBody)
 	}
 	if subscriber.Address != "ada@example.com" {

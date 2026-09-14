@@ -69,7 +69,8 @@ func TestInboundRetryAndBypass(t *testing.T) {
 	var paths []string
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
 		paths = append(paths, r.Method+" "+r.URL.Path)
-		success(t, w, http.StatusOK, `{"queued":true}`)
+		// The API names this "requeued", and answers with the message too.
+		success(t, w, http.StatusOK, `{"requeued":true,"message":{"id":55,"status":"Pending"}}`)
 	})
 	ctx := context.Background()
 	retried, err := client.Inbound.Retry(ctx, 55)
@@ -79,8 +80,11 @@ func TestInboundRetryAndBypass(t *testing.T) {
 	if _, err := client.Inbound.Bypass(ctx, 55); err != nil {
 		t.Fatal(err)
 	}
-	if !retried.Queued {
+	if !retried.Requeued {
 		t.Errorf("retry = %+v", retried)
+	}
+	if retried.Message.ID != 55 {
+		t.Errorf("message = %+v", retried.Message)
 	}
 	if paths[0] != "POST /api/v2/server/inbound/55/retry" || paths[1] != "POST /api/v2/server/inbound/55/bypass" {
 		t.Errorf("paths = %v", paths)

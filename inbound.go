@@ -38,8 +38,11 @@ type ListInboundResult struct {
 
 // RequeueResult reports what a retry or bypass did.
 type RequeueResult struct {
-	// Queued is true when the message went back on the delivery queue.
-	Queued bool `json:"queued"`
+	// Requeued is true when the message went back on the delivery queue.
+	// The API names this field "requeued".
+	Requeued bool `json:"requeued"`
+	// Message is the message as it now stands.
+	Message Message `json:"message"`
 }
 
 // List returns inbound and held messages, newest first. opts may be

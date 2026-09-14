@@ -22,8 +22,6 @@ type Subscriber struct {
 	ID int64 `json:"id"`
 	// Address is the email address.
 	Address string `json:"address"`
-	// Name is the optional display name.
-	Name string `json:"name"`
 	// Status is "subscribed" or "unsubscribed".
 	Status string `json:"status"`
 	// CreatedAt is when the subscription row was created.
@@ -35,8 +33,6 @@ type Subscriber struct {
 type AddSubscriberRequest struct {
 	// Address is the email address (required).
 	Address string `json:"address"`
-	// Name is the optional display name.
-	Name string `json:"name,omitempty"`
 	// Status sets "subscribed" (default) or "unsubscribed".
 	Status string `json:"status,omitempty"`
 }

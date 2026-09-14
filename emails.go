@@ -79,8 +79,6 @@ type SendToStreamRequest struct {
 	// TemplateModel provides the values for the template's
 	// {{ variables }}.
 	TemplateModel map[string]any `json:"template_model,omitempty"`
-	// Tag is a free-form tag for filtering and stats.
-	Tag string `json:"tag,omitempty"`
 }
 
 // SendToStreamResult reports how a broadcast was split.

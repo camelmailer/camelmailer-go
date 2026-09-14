@@ -10,7 +10,7 @@ import (
 )
 
 const layoutJSON = `{"id":1,"uuid":"l-1","name":"Default","permalink":"default",` +
-	`"html_wrapper":"<html><body>{{{ content }}}</body></html>","text_wrapper":"{{{ content }}}"}`
+	`"html_wrapper":"<html><body>{{{ content }}}</body></html>","text_wrapper":null}`
 
 func TestLayoutsList(t *testing.T) {
 	client := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +101,7 @@ func TestLayoutsUploadLogo(t *testing.T) {
 		}
 		raw, _ := io.ReadAll(r.Body)
 		_ = json.Unmarshal(raw, &gotBody)
-		success(t, w, http.StatusOK, `{"logo_url":"https://app.camelmailer.com/logos/default.png"}`)
+		success(t, w, http.StatusOK, `{"url":"https://app.camelmailer.com/assets/layouts/l-1/logo"}`)
 	})
 	url, err := client.Layouts.UploadLogo(context.Background(), "default", "data:image/png;base64,iVBORw0KGgo=")
 	if err != nil {
@@ -110,7 +110,9 @@ func TestLayoutsUploadLogo(t *testing.T) {
 	if gotBody["data_url"] != "data:image/png;base64,iVBORw0KGgo=" {
 		t.Errorf("body = %v", gotBody)
 	}
-	if url != "https://app.camelmailer.com/logos/default.png" {
+	// The API names this key "url"; reading "logo_url" would silently
+	// return the empty string.
+	if url != "https://app.camelmailer.com/assets/layouts/l-1/logo" {
 		t.Errorf("url = %s", url)
 	}
 }

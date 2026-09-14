@@ -26,9 +26,10 @@ type Layout struct {
 	// Permalink identifies the layout in API calls.
 	Permalink string `json:"permalink"`
 	// HTMLWrapper wraps the HTML body; it embeds the body with
-	// {{{ content }}}.
+	// {{{ content }}}. Required when creating a layout.
 	HTMLWrapper string `json:"html_wrapper"`
-	// TextWrapper wraps the plain-text body.
+	// TextWrapper wraps the plain-text body. Empty when the layout has
+	// none; the API answers with an explicit null there.
 	TextWrapper string `json:"text_wrapper"`
 }
 
@@ -130,10 +131,11 @@ func (s *LayoutsService) UploadLogo(ctx context.Context, permalink, dataURL stri
 		DataURL string `json:"data_url"`
 	}{DataURL: dataURL}
 	var out struct {
-		LogoURL string `json:"logo_url"`
+		// The API names this key "url", not "logo_url".
+		URL string `json:"url"`
 	}
 	if err := s.client.do(ctx, http.MethodPost, layoutPath(permalink)+"/logo", nil, body, &out); err != nil {
 		return "", err
 	}
-	return out.LogoURL, nil
+	return out.URL, nil
 }

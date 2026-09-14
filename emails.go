@@ -61,6 +61,36 @@ type SendWithTemplateRequest struct {
 	TemplateModel map[string]any `json:"template_model,omitempty"`
 }
 
+// SendToStreamRequest is the payload for EmailsService.SendToStream.
+// Either give Subject with a body, or a Template permalink with an
+// optional TemplateModel.
+type SendToStreamRequest struct {
+	// From is the sender address.
+	From Address `json:"from"`
+	// Subject is the message subject.
+	Subject string `json:"subject,omitempty"`
+	// HTMLBody is the HTML part.
+	HTMLBody string `json:"html_body,omitempty"`
+	// TextBody is the plain-text part.
+	TextBody string `json:"text_body,omitempty"`
+	// Template is the permalink of a stored template to render instead
+	// of the bodies above.
+	Template string `json:"template,omitempty"`
+	// TemplateModel provides the values for the template's
+	// {{ variables }}.
+	TemplateModel map[string]any `json:"template_model,omitempty"`
+	// Tag is a free-form tag for filtering and stats.
+	Tag string `json:"tag,omitempty"`
+}
+
+// SendToStreamResult reports how a broadcast was split.
+type SendToStreamResult struct {
+	// Queued counts the recipients queued.
+	Queued int64 `json:"queued"`
+	// Skipped counts the recipients past the per-request cap of 1000.
+	Skipped int64 `json:"skipped"`
+}
+
 // SendRecipient is the per-recipient outcome of a send.
 type SendRecipient struct {
 	// RcptTo is the recipient address.
@@ -203,10 +233,30 @@ type ListEmailsResult struct {
 
 // Send queues one message per recipient.
 //
+// Pass WithIdempotencyKey to make the send replayable.
+//
 // API: POST /api/v2/server/messages
-func (s *EmailsService) Send(ctx context.Context, req *SendEmailRequest) (*SendResult, error) {
+func (s *EmailsService) Send(ctx context.Context, req *SendEmailRequest, opts ...SendOption) (*SendResult, error) {
 	out := new(SendResult)
-	if err := s.client.do(ctx, http.MethodPost, "/api/v2/server/messages", nil, req, out); err != nil {
+	header := applySendOptions(opts).header()
+	if err := s.client.doWithHeader(ctx, http.MethodPost, "/api/v2/server/messages", nil, header, req, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SendToStream sends the same content to every subscriber of a
+// broadcast stream.
+//
+// The response counts what was Queued against what was Skipped:
+// recipients past the per-request cap of 1000 are skipped rather than
+// queued, so a larger audience wants a campaign.
+//
+// API: POST /api/v2/server/streams/{permalink}/send
+func (s *EmailsService) SendToStream(ctx context.Context, permalink string, req *SendToStreamRequest) (*SendToStreamResult, error) {
+	out := new(SendToStreamResult)
+	path := "/api/v2/server/streams/" + url.PathEscape(permalink) + "/send"
+	if err := s.client.do(ctx, http.MethodPost, path, nil, req, out); err != nil {
 		return nil, err
 	}
 	return out, nil
@@ -216,9 +266,10 @@ func (s *EmailsService) Send(ctx context.Context, req *SendEmailRequest) (*SendR
 // per entry; individual entries can fail without failing the batch.
 //
 // API: POST /api/v2/server/messages/batch
-func (s *EmailsService) SendBatch(ctx context.Context, reqs []*SendEmailRequest) (*BatchSendResult, error) {
+func (s *EmailsService) SendBatch(ctx context.Context, reqs []*SendEmailRequest, opts ...SendOption) (*BatchSendResult, error) {
 	out := new(BatchSendResult)
-	if err := s.client.do(ctx, http.MethodPost, "/api/v2/server/messages/batch", nil, reqs, out); err != nil {
+	header := applySendOptions(opts).header()
+	if err := s.client.doWithHeader(ctx, http.MethodPost, "/api/v2/server/messages/batch", nil, header, reqs, out); err != nil {
 		return nil, err
 	}
 	return out, nil
@@ -228,9 +279,10 @@ func (s *EmailsService) SendBatch(ctx context.Context, reqs []*SendEmailRequest)
 // req.TemplateModel and sends the result.
 //
 // API: POST /api/v2/server/messages/with_template
-func (s *EmailsService) SendWithTemplate(ctx context.Context, req *SendWithTemplateRequest) (*SendResult, error) {
+func (s *EmailsService) SendWithTemplate(ctx context.Context, req *SendWithTemplateRequest, opts ...SendOption) (*SendResult, error) {
 	out := new(SendResult)
-	if err := s.client.do(ctx, http.MethodPost, "/api/v2/server/messages/with_template", nil, req, out); err != nil {
+	header := applySendOptions(opts).header()
+	if err := s.client.doWithHeader(ctx, http.MethodPost, "/api/v2/server/messages/with_template", nil, header, req, out); err != nil {
 		return nil, err
 	}
 	return out, nil
@@ -240,9 +292,10 @@ func (s *EmailsService) SendWithTemplate(ctx context.Context, req *SendWithTempl
 // one call and returns one result per entry.
 //
 // API: POST /api/v2/server/messages/with_template/batch
-func (s *EmailsService) SendWithTemplateBatch(ctx context.Context, reqs []*SendWithTemplateRequest) (*BatchSendResult, error) {
+func (s *EmailsService) SendWithTemplateBatch(ctx context.Context, reqs []*SendWithTemplateRequest, opts ...SendOption) (*BatchSendResult, error) {
 	out := new(BatchSendResult)
-	if err := s.client.do(ctx, http.MethodPost, "/api/v2/server/messages/with_template/batch", nil, reqs, out); err != nil {
+	header := applySendOptions(opts).header()
+	if err := s.client.doWithHeader(ctx, http.MethodPost, "/api/v2/server/messages/with_template/batch", nil, header, reqs, out); err != nil {
 		return nil, err
 	}
 	return out, nil

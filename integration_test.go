@@ -59,6 +59,21 @@ func TestIntegrationRoundtrip(t *testing.T) {
 	if _, err := client.DMARC.Summary(ctx, nil); err != nil {
 		t.Fatalf("dmarc.summary: %v", err)
 	}
+	if _, err := client.Campaigns.List(ctx); err != nil {
+		t.Fatalf("campaigns.list: %v", err)
+	}
+	if _, err := client.Layouts.List(ctx); err != nil {
+		t.Fatalf("layouts.list: %v", err)
+	}
+	if _, err := client.Inbound.List(ctx, &ListInboundOptions{ListOptions: ListOptions{PerPage: 1}}); err != nil {
+		t.Fatalf("inbound.list: %v", err)
+	}
+	if _, err := client.Logs.List(ctx, &ListLogsOptions{ListOptions: ListOptions{PerPage: 1}}); err != nil {
+		t.Fatalf("logs.list: %v", err)
+	}
+	if _, err := client.Logs.Tags(ctx); err != nil {
+		t.Fatalf("logs.tags: %v", err)
+	}
 
 	from := os.Getenv("CAMELMAILER_TEST_FROM")
 	to := os.Getenv("CAMELMAILER_TEST_TO")

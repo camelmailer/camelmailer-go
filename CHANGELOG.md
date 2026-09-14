@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-14
+
+### Added
+
+- `Campaigns`: `CreateDraft`, `CreateAndSend`, `List`, `ListForStream`,
+  `Get`, `GetForStream`, `Update`, `Send`, `Cancel`. The two create methods
+  hit different routes: `CreateDraft` writes the campaign and waits, while
+  `CreateAndSend` expands it to the stream's subscribers before the call
+  returns.
+- `Subscribers`: `List`, `Add`, `Import`, `Complaint`, `Remove`.
+- `Layouts`: `List`, `Create`, `Get`, `Update`, `Delete`, `UploadLogo`.
+- `Inbound`: `List`, `Get`, `Retry`, `Bypass`.
+- `Logs`: `List`, `Tags`.
+- `Emails.SendToStream` for broadcasting to a stream's subscribers.
+- `WithIdempotencyKey`, accepted by all four send methods. The key travels
+  as the `Idempotency-Key` header, because the body is what the server
+  hashes to recognise a replay. Passed variadically, so the existing
+  signatures are unchanged.
+
 ## [0.1.0] - 2026-07-11
 
 ### Added
@@ -25,5 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `errors.As`-compatible.
 - Integration roundtrip test, skipped unless `CAMELMAILER_API_KEY` is set.
 
-[Unreleased]: https://github.com/camelmailer/camelmailer-go/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/camelmailer/camelmailer-go/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/camelmailer/camelmailer-go/releases/tag/v0.2.0
 [0.1.0]: https://github.com/camelmailer/camelmailer-go/releases/tag/v0.1.0

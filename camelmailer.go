@@ -34,7 +34,7 @@ import (
 const DefaultBaseURL = "https://app.camelmailer.com"
 
 // Version is the SDK version, sent in the User-Agent header.
-const Version = "0.1.0"
+const Version = "0.2.0"
 
 const defaultUserAgent = "camelmailer-go/" + Version
 
@@ -58,6 +58,16 @@ type Client struct {
 	Bounces *BouncesService
 	// DMARC reads stored DMARC aggregate reports and summaries.
 	DMARC *DMARCService
+	// Campaigns plans and sends broadcast campaigns.
+	Campaigns *CampaignsService
+	// Subscribers manages the opt-in audience of a broadcast stream.
+	Subscribers *SubscribersService
+	// Layouts manages the wrappers shared by templates.
+	Layouts *LayoutsService
+	// Inbound reads inbound and held messages.
+	Inbound *InboundService
+	// Logs reads the server's request log and tag index.
+	Logs *LogsService
 }
 
 // Option configures a Client created by NewClient.
@@ -106,6 +116,11 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.Stats = &StatsService{client: c}
 	c.Bounces = &BouncesService{client: c}
 	c.DMARC = &DMARCService{client: c}
+	c.Campaigns = &CampaignsService{client: c}
+	c.Subscribers = &SubscribersService{client: c}
+	c.Layouts = &LayoutsService{client: c}
+	c.Inbound = &InboundService{client: c}
+	c.Logs = &LogsService{client: c}
 	return c
 }
 
@@ -142,6 +157,14 @@ type envelope struct {
 // success envelope, data is decoded into out (if non-nil). Error
 // envelopes and non-2xx responses become *APIError.
 func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any) error {
+	return c.doWithHeader(ctx, method, path, query, nil, body, out)
+}
+
+// doWithHeader is do with extra request headers. Separate because only
+// the send endpoints need one (Idempotency-Key), and that key belongs
+// outside the body: the body is what the server hashes to recognise the
+// same request.
+func (c *Client) doWithHeader(ctx context.Context, method, path string, query url.Values, header http.Header, body, out any) error {
 	endpoint := c.baseURL + path
 	if len(query) > 0 {
 		endpoint += "?" + query.Encode()
@@ -165,6 +188,11 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	req.Header.Set("User-Agent", c.userAgent)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
+	}
+	for name, values := range header {
+		for _, value := range values {
+			req.Header.Set(name, value)
+		}
 	}
 
 	resp, err := c.httpClient.Do(req)
